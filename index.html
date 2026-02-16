@@ -1,199 +1,213 @@
+HTML
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Архитектура Доступа 2.0</title>
+    <title>Deep Scan: Архитектура Доступа 2.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <style>
-        body { background-color: #0f172a; color: white; font-family: sans-serif; }
-        .step-enter { animation: fadeIn 0.5s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        input, textarea, select { width: 100%; padding: 12px; background: #1e293b; border: 1px solid #334155; border-radius: 8px; color: white; margin-top: 8px; }
-        label { font-weight: bold; color: #94a3b8; display: block; margin-top: 20px; }
-        .btn-next { background: #3b82f6; color: white; padding: 15px 30px; border-radius: 8px; font-weight: bold; width: 100%; margin-top: 30px; transition: all 0.3s; }
-        .btn-next:hover { background: #2563eb; transform: scale(1.02); }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+        body { background-color: #020617; color: #f8fafc; font-family: 'Inter', sans-serif; }
+        .glass-panel { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(16px); border: 1px solid rgba(56, 189, 248, 0.2); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
+        input, textarea, select { width: 100%; padding: 14px; background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; color: white; margin-top: 6px; transition: 0.3s; }
+        input:focus, textarea:focus { border-color: #38bdf8; outline: none; box-shadow: 0 0 10px rgba(56, 189, 248, 0.1); }
+        label { font-size: 0.75rem; font-weight: 700; color: #38bdf8; display: block; margin-top: 24px; text-transform: uppercase; letter-spacing: 0.1em; }
+        .rule { font-size: 0.75rem; color: #64748b; font-style: italic; margin-top: 4px; line-height: 1.4; }
+        .btn-action { background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%); color: white; padding: 18px; border-radius: 14px; font-weight: 800; width: 100%; margin-top: 32px; transition: 0.4s; text-transform: uppercase; letter-spacing: 0.1em; }
+        .btn-action:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(37, 99, 235, 0.4); }
+        .btn-action:disabled { opacity: 0.5; cursor: not-allowed; }
     </style>
 </head>
 <body>
     <div id="root"></div>
-
     <script type="text/babel">
         const { useState } = React;
-
         const App = () => {
             const [step, setStep] = useState(1);
             const [formData, setFormData] = useState({});
             const [isSubmitting, setIsSubmitting] = useState(false);
 
-            // ТВОИ ДАННЫЕ ИНТЕГРИРОВАНЫ
-            const TELEGRAM_BOT_TOKEN = '7942551419:AAGr8sj_Utwfva-05RusEC255TrguVEsOO0'; 
-            const TELEGRAM_CHAT_ID = '829634068';
+            const BOT_TOKEN = '7942551419:AAGr8sj_Utwfva-05RusEC255TrguVEsOO0';
+            const CHAT_ID = '829634068';
 
-            const updateData = (e) => {
-                setFormData({ ...formData, [e.target.name]: e.target.value });
-            };
+            const update = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
+            const next = () => { window.scrollTo(0, 0); setStep(step + 1); };
 
-            const sendToTelegram = async () => {
+            const submit = async () => {
                 setIsSubmitting(true);
-                let message = `🚀 **НОВАЯ ЗАЯВКА: ДОСТУП 2.0**\n\n`;
-                Object.entries(formData).forEach(([key, value]) => {
-                    message += `🔹 **${key}:** ${value}\n`;
-                });
-
+                let msg = `🔥 **DEEP SCAN: NEW PROTOCOL**\n\n`;
+                Object.entries(formData).forEach(([k, v]) => msg += `🔹 **${k.replace(/_/g, ' ')}:** ${v}\n`);
+                
                 try {
                     await fetch(`https://api.telegram.org/bot7942551419:AAGr8sj_Utwfva-05RusEC255TrguVEsOO0/sendMessage`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ chat_id:'829634068', text: message, parse_mode: 'Markdown' })
+                        body: JSON.stringify({ chat_id:'829634068', text: msg, parse_mode: 'Markdown' })
                     });
                     setStep(8);
-                } catch (error) {
-                    alert('Ошибка связи с Триадой. Попробуйте еще раз.');
-                }
+                } catch (e) { alert('Системная ошибка. Проверьте сеть.'); }
                 setIsSubmitting(false);
             };
 
             return (
-                <div className="max-w-2xl mx-auto p-6 md:pt-20">
+                <div className="max-w-xl mx-auto p-6 md:pt-16 pb-20">
                     {step === 1 && (
-                        <div className="step-enter">
-                            <h1 className="text-3xl font-bold text-blue-400 mb-6">Архитектура доступа 2.0</h1>
-                            <div className="bg-slate-800 p-6 rounded-xl border border-blue-500/30 text-slate-300 space-y-4 mb-8">
-                                <p className="text-red-400 font-bold uppercase tracking-wider">ВНИМАНИЕ: Это не опрос. Это ваша первая сессия реинжиниринга.</p>
-                                <p><strong>ИНВЕСТИЦИЯ ВРЕМЕНИ (15 МИНУТ):</strong> Если нет времени на диагностику — доступ будет закрыт.</p>
-                                <p><strong>РАДИКАЛЬНАЯ ЧЕСТНОСТЬ:</strong> Анализирует Триада агентов. Ложь = отклонение.</p>
-                                <p><strong>БИОЛОГИЧЕСКИЙ ОТКЛИК:</strong> Мы ищем баги в вашей биологии.</p>
-                                <p><strong>ГЛУБИНА ТРАНСФОРМАЦИИ:</strong> Готовность к сносу до 80% процессов.</p>
+                        <div className="glass-panel p-8 rounded-3xl border-t-4 border-t-sky-500">
+                            <h1 className="text-3xl font-black mb-6 tracking-tighter italic">DEEP SCAN 2.0</h1>
+                            <div className="text-sm text-slate-400 space-y-4 mb-8">
+                                <p className="text-sky-400 font-bold underline">ПРАВИЛА ПРОХОЖДЕНИЯ:</p>
+                                <p>1. **ВРЕМЯ:** Минимум 15 минут в тишине. Поверхностные ответы = автоотказ.</p>
+                                <p>2. **ТЕЛО:** Если при ответе возникает дискомфорт — это и есть точка вашего роста. Не игнорируйте её.</p>
+                                <p>3. **ТРИАДА:** Анализ ведут агенты Analytic, Mirror, Guardian. Будьте честны.</p>
                             </div>
-                            <label>Электронная почта *</label>
-                            <input type="email" name="Email" onChange={updateData} placeholder="example@mail.com" required />
-                            <button className="btn-next" onClick={() => setStep(2)}>ПРИНЯТЬ ПРАВИЛА И НАЧАТЬ</button>
+                            <label>Ваш Email *</label>
+                            <input type="email" name="Email" onChange={update} placeholder="Для идентификации в системе" required />
+                            <button className="btn-action" onClick={next}>АКТИВИРОВАТЬ СКАНЕР</button>
                         </div>
                     )}
 
                     {step === 2 && (
-                        <div className="step-enter">
-                            <h2 className="text-2xl font-bold mb-4 text-blue-400">Раздел 2: Знакомство</h2>
-                            <label>Фамилия Имя Отчество *</label>
-                            <input name="ФИО" onChange={updateData} />
-                            <label>Возраст (дата рождения) *</label>
-                            <input name="Возраст" onChange={updateData} />
-                            <label>Контакт: № телефона *</label>
-                            <input name="Телефон" onChange={updateData} />
-                            <label>Ваш город и разница с МСК *</label>
-                            <input name="Город" onChange={updateData} />
-                            <button className="btn-next" onClick={() => setStep(3)}>ДАЛЕЕ</button>
+                        <div className="glass-panel p-8 rounded-3xl">
+                            <h2 className="text-xl font-bold text-sky-400">01. ИДЕНТИФИКАЦИЯ</h2>
+                            <label>ФИО ПОЛНОСТЬЮ *</label>
+                            <input name="ФИО" onChange={update} />
+                            <label>ДАТА РОЖДЕНИЯ *</label>
+                            <input name="Дата_Рождения" onChange={update} placeholder="ДД.ММ.ГГГГ" />
+                            <label>ТЕЛЕФОН (WhatsApp/TG) *</label>
+                            <input name="Телефон" onChange={update} placeholder="+7..." />
+                            <label>ГОРОД И РАЗНИЦА С МСК *</label>
+                            <input name="Локация" onChange={update} placeholder="Напр: Новосибирск, +4 МСК" />
+                            <button className="btn-action" onClick={next}>ДАЛЕЕ</button>
                         </div>
                     )}
 
                     {step === 3 && (
-                        <div className="step-enter">
-                            <h2 className="text-2xl font-bold mb-2 text-blue-400 text-left">Блок 1: Диагностика Фундамента</h2>
-                            <p className="text-sm text-slate-400 mb-6">«Фиксируем твердые факты реальности. Будьте точны в цифрах».</p>
-                            <label>Ниша / Вид деятельности *</label>
-                            <input name="Ниша" onChange={updateData} />
-                            <label>Точка А: Текущий оборот и чистая прибыль *</label>
-                            <textarea name="Точка_А" rows="2" onChange={updateData}></textarea>
-                            <label>Симптом в теле: Физическая боль или дискомфорт в бизнесе? *</label>
-                            <textarea name="Физические_Симптомы" placeholder="ЖКТ, спина, горло, кожа..." onChange={updateData}></textarea>
-                            <label>«Красивая сказка»: Какую ложь вы рассказываете окружающим? *</label>
-                            <textarea name="Сказка" onChange={updateData}></textarea>
-                            <button className="btn-next" onClick={() => setStep(4)}>ДАЛЕЕ</button>
+                        <div className="glass-panel p-8 rounded-3xl">
+                            <h2 className="text-xl font-bold text-sky-400 uppercase">Блок 1: ФУНДАМЕНТ</h2>
+                            <label>НИША И ВИД ДЕЯТЕЛЬНОСТИ *</label>
+                            <input name="Ниша" onChange={update} placeholder="Бизнес / Экспертность" />
+                            <label>ТОЧКА А (ТВЕРДОЕ) *</label>
+                            <p className="rule">Укажите точный оборот и вашу чистую прибыль за последний месяц.</p>
+                            <textarea name="Точка_А" rows="2" onChange={update}></textarea>
+                            <label>СИМПТОМЫ В ТЕЛЕ *</label>
+                            <p className="rule">Что болит или ноет, когда в бизнесе аврал? Спина, ЖКТ, вес, шея? Будьте конкретны.</p>
+                            <textarea name="Тело" onChange={update}></textarea>
+                            <label>«КРАСИВАЯ СКАЗКА» *</label>
+                            <p className="rule">Какую ложь о своем успехе вы транслируете в мир, чтобы скрыть реальный хаос?</p>
+                            <textarea name="Ложь" onChange={update}></textarea>
+                            <button className="btn-action" onClick={next}>ПЕРЕЙТИ К ТРЕЩИНАМ</button>
                         </div>
                     )}
 
                     {step === 4 && (
-                        <div className="step-enter">
-                            <h2 className="text-2xl font-bold mb-2 text-blue-400">Блок 2: Поиск Трещины</h2>
-                            <p className="text-sm text-slate-400 mb-6">«Ищем скрытые выгоды, которые удерживают вас в застое».</p>
-                            <label>Истинная цель бизнеса? (кроме денег) *</label>
-                            <textarea name="Истинная_Цель" onChange={updateData}></textarea>
-                            <label>Почему тебе до сих пор выгодно находиться в этом хаосе? *</label>
-                            <textarea name="Выгода_Хаоса" onChange={updateData}></textarea>
-                            <label>Во сколько тебе обходится один месяц твоего текущего состояния? *</label>
-                            <input name="Цена_Месяца" onChange={updateData} />
-                            <label>Какую проблему считаешь «неизлечимой»? *</label>
-                            <textarea name="Неизлечимое" onChange={updateData}></textarea>
-                            <button className="btn-next" onClick={() => setStep(5)}>ДАЛЕЕ</button>
+                        <div className="glass-panel p-8 rounded-3xl">
+                            <h2 className="text-xl font-bold text-sky-400 uppercase">Блок 2: ПОИСК ТРЕЩИНЫ</h2>
+                            <label>ИСТИННАЯ ЦЕЛЬ (БЕЗ КУПЮР) *</label>
+                            <p className="rule">Зачем вам этот бизнес на самом деле? Власть, месть, безопасность, свобода?</p>
+                            <textarea name="Истинная_Цель" onChange={update}></textarea>
+                            <label>ВЫГОДА ХАОСА *</label>
+                            <p className="rule">Почему вам ВЫГОДНО, чтобы ничего не менялось? Что страшного случится, если всё станет легко?</p>
+                            <textarea name="Выгода_Хаоса" onChange={update}></textarea>
+                            <label>СТОИМОСТЬ ЗАСТОЯ *</label>
+                            <p className="rule">Сколько денег и здоровья вы сливаете в месяц, пока не решаете проблему?</p>
+                            <input name="Цена_Простоя" onChange={update} />
+                            <label>«НЕИЗЛЕЧИМОЕ» *</label>
+                            <p className="rule">Что в вашей жизни вы считаете фатальным и боитесь даже обсуждать?</p>
+                            <textarea name="Скрытый_Страх" onChange={update}></textarea>
+                            <label>БАРЬЕР X10 *</label>
+                            <p className="rule">Какое ОДНО препятствие мешает вырасти в 10 раз прямо сейчас?</p>
+                            <textarea name="Барьер_X10" onChange={update}></textarea>
+                            <label>ЗОНА СОПРОТИВЛЕНИЯ *</label>
+                            <select name="Зона_Сопротивления" onChange={update}>
+                                <option value="">Где больше всего боли?</option>
+                                <option value="Деньги">Деньги (финансы)</option>
+                                <option value="Команда">Команда (люди)</option>
+                                <option value="Стратегия">Стратегия (хаос)</option>
+                            </select>
+                            <button className="btn-action" onClick={next}>ТЕСТ НА ГОТОВНОСТЬ</button>
                         </div>
                     )}
 
                     {step === 5 && (
-                        <div className="step-enter">
-                            <h2 className="text-2xl font-bold mb-2 text-blue-400">Блок 3: Тест на Готовность</h2>
-                            <label>Ты готов к «направленному взрыву» убеждений, даже если будет больно? *</label>
-                            <select name="Готовность_Взрыв" onChange={updateData}>
-                                <option value="">Выбрать...</option>
-                                <option value="Да">Да, готов</option>
-                                <option value="Нет">Нет, боюсь</option>
+                        <div className="glass-panel p-8 rounded-3xl">
+                            <h2 className="text-xl font-bold text-sky-400 uppercase">Блок 3: ГОТОВНОСТЬ</h2>
+                            <label>ГОТОВЫ К «НАПРАВЛЕННОМУ ВЗРЫВУ»? *</label>
+                            <p className="rule">Я буду ломать старое. Вы готовы к боли трансформации?</p>
+                            <select name="Взрыв" onChange={update}>
+                                <option value="">Ваш выбор...</option>
+                                <option value="Да">ДА, ГОТОВ К ЛЮБОМУ СНОСУ</option>
+                                <option value="Нет">НЕТ, ХОЧУ КОСМЕТИЧЕСКИЙ РЕМОНТ</option>
                             </select>
-                            <label>Кто в системе принимает решения — ты или страх? Где он в теле? *</label>
-                            <textarea name="Кто_Решает" onChange={updateData}></textarea>
-                            <label>Если ты исчезнешь на месяц — через сколько дней система обнулится? *</label>
-                            <input name="Срок_Обнуления" onChange={updateData} />
-                            <label>Опиши результат сессии, за который готов платить от 400 000 руб. *</label>
-                            <textarea name="Результат_400к" onChange={updateData}></textarea>
-                            <button className="btn-next" onClick={() => setStep(6)}>ДАЛЕЕ</button>
+                            <label>КТО ПРИНИМАЕТ РЕШЕНИЯ? *</label>
+                            <p className="rule">Вы или ваш страх? Где в теле вы чувствуете этот страх прямо сейчас?</p>
+                            <textarea name="Хозяин_Решений" onChange={update}></textarea>
+                            <label>СРОК ОБНУЛЕНИЯ СИСТЕМЫ *</label>
+                            <p className="rule">Если вы исчезнете на месяц — через сколько дней ваш бизнес умрет?</p>
+                            <input name="Смерть_Бизнеса" onChange={update} />
+                            <label>ЦЕННОСТЬ ОДНОЙ СЕССИИ *</label>
+                            <p className="rule">За какой результат вы заплатите 400 000 руб. без раздумий?</p>
+                            <textarea name="За_Что_400к" onChange={update}></textarea>
+                            <button className="btn-action" onClick={next}>РЕСУРСЫ</button>
                         </div>
                     )}
 
                     {step === 6 && (
-                        <div className="step-enter">
-                            <h2 className="text-2xl font-bold mb-2 text-blue-400">Блок 4: Ресурсы и Обязательства</h2>
-                            <label>За какой срок ты хочешь выйти на новый уровень? *</label>
-                            <input name="Желаемый_Срок" onChange={updateData} />
-                            <label>Есть ли человек для внедрения изменений или ты сам «узкое горлышко»? *</label>
-                            <input name="Кто_Внедряет" onChange={updateData} />
-                            <label>Что чувствуете, когда сотрудники «косячат»? (Реакция тела) *</label>
-                            <textarea name="Реакция_Косяки" onChange={updateData}></textarea>
-                            <label>Какую сумму готов инвестировать в «Автоматизацию Чуда» прямо сейчас? *</label>
-                            <input name="Инвестиции" onChange={updateData} />
-                            <label>Сколько часов в неделю готов выделить на пересборку? *</label>
-                            <input name="Часы_на_Архитектуру" onChange={updateData} />
-                            <button className="btn-next" onClick={() => setStep(7)}>ДАЛЕЕ</button>
+                        <div className="glass-panel p-8 rounded-3xl">
+                            <h2 className="text-xl font-bold text-sky-400 uppercase">Блок 4: ОБЯЗАТЕЛЬСТВА</h2>
+                            <label>РЕАЛЬНЫЙ СРОК ТРАНСФОРМАЦИИ *</label>
+                            <input name="Срок" onChange={update} placeholder="Напр: 6 месяцев" />
+                            <label>УЗКОЕ ГОРЛЫШКО *</label>
+                            <p className="rule">Вы единственный, кто тянет? Или есть кому внедрять изменения?</p>
+                            <input name="Внедрение" onChange={update} />
+                            <label>РЕАКЦИЯ НА КОСЯКИ *</label>
+                            <p className="rule">Опишите физическую реакцию: гнев, сжатие челюстей, ком в горле?</p>
+                            <textarea name="Реакция_Тела" onChange={update}></textarea>
+                            <label>ИНВЕСТИЦИЯ В ЧУДО *</label>
+                            <p className="rule">Какую сумму готовы вложить в автоматизацию своей свободы ПРЯМО СЕЙЧАС?</p>
+                            <input name="Бюджет" onChange={update} />
+                            <label>ЧАСОВ В НЕДЕЛЮ НА СЕБЯ *</label>
+                            <input name="Время_на_пересборку" onChange={update} placeholder="Минимум 5-10 часов" />
+                            <button className="btn-action" onClick={next}>ФИНАЛЬНЫЙ ФИЛЬТР</button>
                         </div>
                     )}
 
                     {step === 7 && (
-                        <div className="step-enter">
-                            <h2 className="text-2xl font-bold mb-2 text-blue-400 text-left">Блок 5: «Частота соответствия»</h2>
-                            <label>Почему мой Дар Архитектора — ключ к твоему замку? *</label>
-                            <textarea name="Почему_Архитектор" onChange={updateData}></textarea>
-                            <label>Точка Б: Деньги, часы работы, локация через год *</label>
-                            <textarea name="Точка_Б" onChange={updateData}></textarea>
-                            <label>Понимаешь, что решение принимает Триада Агентов? *</label>
-                            <input name="Понимание_Триады" placeholder="Да / Свой вариант" onChange={updateData} />
-                            <label>Ник ТГ (@ИМЯ) *</label>
-                            <input name="Ник_ТГ" placeholder="@username" onChange={updateData} />
-                            <button className="btn-next" onClick={sendToTelegram} disabled={isSubmitting}>
-                                {isSubmitting ? 'ТРИАДА АНАЛИЗИРУЕТ...' : 'ОТПРАВИТЬ ДАННЫЕ АГЕНТАМ'}
+                        <div className="glass-panel p-8 rounded-3xl">
+                            <h2 className="text-xl font-bold text-sky-400 uppercase">Блок 5: СООТВЕТСТВИЕ</h2>
+                            <label>ПОЧЕМУ АРХИТЕКТОР? *</label>
+                            <p className="rule">Почему именно мой метод — это ключ к вашему будущему?</p>
+                            <textarea name="Почему_Я" onChange={update}></textarea>
+                            <label>ВАША ТОЧКА Б (ЧЕРЕЗ ГОД) *</label>
+                            <p className="rule">Деньги, часы работы, локация. Опишите чертеж вашей новой жизни.</p>
+                            <textarea name="Точка_Б" onChange={update}></textarea>
+                            <label>НИК В ТЕЛЕГРАМ (@NAME) *</label>
+                            <input name="Ник_ТГ" onChange={update} required />
+                            <button className="btn-action" onClick={submit} disabled={isSubmitting}>
+                                {isSubmitting ? 'ТРИАДА ПРОВЕРЯЕТ...' : 'ОТПРАВИТЬ ДАННЫЕ АГЕНТАМ'}
                             </button>
                         </div>
                     )}
 
                     {step === 8 && (
-                        <div className="step-enter text-center space-y-8">
-                            <div className="inline-block p-4 rounded-full bg-green-500/20 mb-4">
-                                <svg className="w-16 h-16 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                        <div className="glass-panel p-10 rounded-3xl text-center space-y-8 border-2 border-green-500/30">
+                            <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto">
+                                <svg className="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
                             </div>
-                            <h2 className="text-3xl font-bold text-green-400">ВЕРДИКТ В ОБРАБОТКЕ</h2>
-                            <p className="text-slate-300">Данные переданы Триаде. В течение 24/48 часов Архитектор вынесет решение. В случае успеха вы получите JSON-отчет.</p>
-                            <div className="bg-slate-800 p-6 rounded-xl border border-yellow-500/40 text-left">
-                                <p className="font-bold text-yellow-500 mb-3">СЛЕДУЮЩИЙ ШАГ:</p>
-                                <p className="text-sm italic mb-4">«Я ищу корни системного сбоя. Будьте готовы к холодному результату».</p>
-                                <a href="https://t.me/no_chaos_business/17" target="_blank" className="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition">ЧИТАТЬ КЕЙС</a>
+                            <h2 className="text-3xl font-black text-white tracking-widest uppercase">Вердикт в обработке</h2>
+                            <p className="text-slate-400 text-sm leading-relaxed">Данные переданы Триаде Агентов. Я ищу корни вашего системного сбоя. Будьте готовы к холодному и точному результату.</p>
+                            <div className="pt-6 border-t border-slate-800">
+                                <p className="text-xs text-sky-400 mb-4 font-bold">ВАШ СЛЕДУЮЩИЙ ШАГ ПОДТВЕРЖДЕН:</p>
+                                <a href="https://t.me/no_chaos_business/17" target="_blank" className="btn-action block">ИЗУЧИТЬ КЕЙС РЕКОНСТРУКЦИИ</a>
                             </div>
-                            <p className="text-slate-500 text-sm">Если будет виден потенциал — я свяжусь с вами лично.</p>
                         </div>
                     )}
                 </div>
             );
         };
-
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<App />);
     </script>
