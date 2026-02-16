@@ -30,10 +30,9 @@ HTML
         }
         .btn-prime:hover { transform: translateY(-2px); box-shadow: 0 15px 30px rgba(37, 99, 235, 0.4); }
         .error-overlay { 
-            background: rgba(220, 38, 38, 0.15); border: 1px solid #ef4444; color: #fca5a5; 
+            background: rgba(220, 38, 38, 0.2); border: 1px solid #ef4444; color: #fca5a5; 
             padding: 15px; border-radius: 12px; font-size: 0.85rem; margin-bottom: 25px; 
         }
-        .step-indicator { color: #38bdf8; font-size: 0.7rem; font-weight: bold; margin-bottom: 10px; display: block; }
     </style>
 </head>
 <body>
@@ -54,11 +53,19 @@ HTML
                 if (error) setError(""); 
             };
 
-            const validateAndNext = (fields, minLength = 5) => {
-                for (let field of fields) {
+            const validateAndNext = (textFields, techFields = []) => {
+                // Проверка глубоких текстовых полей
+                for (let field of textFields) {
                     const value = formData[field] || "";
-                    if (value.trim().length < minLength) {
-                        setError(`ВНИМАНИЕ: Поле "${field.replace(/_/g, ' ')}" заполнено слишком коротко. Триада не примет поверхностный ответ. Опишите глубже.`);
+                    if (value.trim().length < 10) {
+                        setError(`ВНИМАНИЕ: Поле "${field.replace(/_/g, ' ')}" требует более глубокого ответа (мин. 10 символов).`);
+                        return;
+                    }
+                }
+                // Проверка обязательности технических полей (просто наличие)
+                for (let field of techFields) {
+                    if (!formData[field] || formData[field].trim() === "") {
+                        setError(`СИСТЕМА: Поле "${field.replace(/_/g, ' ')}" обязательно для заполнения.`);
                         return;
                     }
                 }
@@ -68,16 +75,12 @@ HTML
             };
 
             const sendFinalData = async () => {
-                if (!formData.Ник_ТГ || formData.Ник_ТГ.length < 3) {
-                    setError("Укажите ваш ник в Telegram для связи.");
-                    return;
-                }
+                if (!formData.Ник_ТГ) { setError("Укажите ваш ник в Telegram."); return; }
                 setIsSubmitting(true);
-                let message = `🚀 **НОВЫЙ ПРОТОКОЛ: DEEP SCAN 2.0**\n\n`;
+                let message = `🚀 **DEEP SCAN PROTOCOL: СДАН**\n\n`;
                 Object.entries(formData).forEach(([key, val]) => {
                     message += `🔹 **${key.replace(/_/g, ' ')}:** ${val}\n`;
                 });
-
                 try {
                     await fetch(`https://api.telegram.org/bot7942551419:AAGr8sj_Utwfva-05RusEC255TrguVEsOO0/sendMessage`, {
                         method: 'POST',
@@ -85,9 +88,7 @@ HTML
                         body: JSON.stringify({ chat_id:'829634068', text: message, parse_mode: 'Markdown' })
                     });
                     setStep(8);
-                } catch (e) {
-                    setError("ОШИБКА СЕРВЕРА. Попробуйте еще раз.");
-                }
+                } catch (e) { setError("СБОЙ СЕТИ. Попробуйте еще раз."); }
                 setIsSubmitting(false);
             };
 
@@ -98,150 +99,109 @@ HTML
                     {step === 1 && (
                         <div className="glass-panel p-10 rounded-3xl border-t-8 border-sky-500">
                             <h1 className="text-4xl font-black mb-6 tracking-tighter italic">DEEP SCAN 2.0</h1>
-                            <div className="space-y-6 text-sm text-slate-300 mb-8">
-                                <p className="text-sky-400 font-bold uppercase underline">ПРАВИЛА ПРОХОЖДЕНИЯ (БЕЗ ИСКЛЮЧЕНИЙ):</p>
-                                <p>1. <strong>ИНВЕСТИЦИЯ ВРЕМЕНИ:</strong> Вам потребуется 15-20 минут. Если вы спешите — закройте анкету сейчас.</p>
-                                <p>2. <strong>РАДИКАЛЬНАЯ ЧЕСТНОСТЬ:</strong> Аналитик-Хирург видит ложь в структуре ответов. Будьте честны прежде всего с собой.</p>
-                                <p>3. <strong>БИОЛОГИЧЕСКИЙ ОТКЛИК:</strong> Если вопрос вызывает дискомфорт, гнев или страх — это именно то место, где зарыты ваши деньги.</p>
-                            </div>
-                            <label>Ваш актуальный Email *</label>
-                            <input type="email" name="Email" onChange={updateField} placeholder="example@mail.com" />
-                            <button className="btn-prime" onClick={() => validateAndNext(["Email"], 6)}>АКТИВИРОВАТЬ СКАНИРОВАНИЕ</button>
+                            <p className="text-sm text-slate-300 mb-8 italic">«Это не опрос. Это сессия реинжиниринга вашей реальности».</p>
+                            <label>Email *</label>
+                            <input type="email" name="Email" onChange={updateField} />
+                            <button className="btn-prime" onClick={() => validateAndNext([], ["Email"])}>НАЧАТЬ</button>
                         </div>
                     )}
 
                     {step === 2 && (
                         <div className="glass-panel p-10 rounded-3xl">
-                            <span className="step-indicator">ШАГ 01 / 06</span>
-                            <h2 className="text-2xl font-bold text-sky-400 mb-6">ИДЕНТИФИКАЦИЯ ЛИЧНОСТИ</h2>
-                            <label>ФИО ПОЛНОСТЬЮ *</label>
-                            <input name="ФИО" onChange={updateField} />
-                            <label>ДАТА РОЖДЕНИЯ (ДД.ММ.ГГГГ) *</label>
-                            <input name="Дата_Рождения" onChange={updateField} />
-                            <label>НОМЕР ТЕЛЕФОНА *</label>
-                            <input name="Телефон" onChange={updateField} placeholder="+7..." />
-                            <label>ГОРОД И РАЗНИЦА С МСК *</label>
-                            <input name="Локация" onChange={updateField} placeholder="Пример: Екатеринбург (+2 МСК)" />
-                            <button className="btn-prime" onClick={() => validateAndNext(["ФИО", "Дата_Рождения", "Телефон", "Локация"], 4)}>ПРОДОЛЖИТЬ</button>
+                            <h2 className="text-2xl font-bold text-sky-400 mb-6">01. ИДЕНТИФИКАЦИЯ</h2>
+                            <label>ФИО ПОЛНОСТЬЮ *</label><input name="ФИО" onChange={updateField} />
+                            <label>ДАТА РОЖДЕНИЯ *</label><input name="Дата_Рождения" onChange={updateField} />
+                            <label>НОМЕР ТЕЛЕФОНА *</label><input name="Телефон" onChange={updateField} />
+                            <label>ГОРОД И РАЗНИЦА С МСК *</label><input name="Локация" onChange={updateField} />
+                            <button className="btn-prime" onClick={() => validateAndNext([], ["ФИО", "Дата_Рождения", "Телефон", "Локация"])}>ДАЛЕЕ</button>
                         </div>
                     )}
 
                     {step === 3 && (
                         <div className="glass-panel p-10 rounded-3xl">
-                            <span className="step-indicator">ШАГ 02 / 06</span>
-                            <h2 className="text-2xl font-bold text-sky-400 mb-6 uppercase">Блок 1: ФУНДАМЕНТ</h2>
-                            <label>НИША И ВИД ДЕЯТЕЛЬНОСТИ *</label>
-                            <input name="Ниша" onChange={updateField} />
-                            <label>ТОЧКА А: ОБОРОТ И ЧИСТАЯ ПРИБЫЛЬ *</label>
-                            <div className="rule-box">Укажите точные цифры за последний месяц. Никаких «примерно».</div>
-                            <textarea name="Точка_А" rows="2" onChange={updateField}></textarea>
-                            <label>ФИЗИЧЕСКИЕ СИМПТОМЫ (ТЕЛО) *</label>
-                            <div className="rule-box">Что болит или зажимается при стрессе? Спина, ЖКТ, шея, голова? Опишите отклик.</div>
+                            <h2 className="text-xl font-bold text-sky-400 uppercase">Блок 1: ФУНДАМЕНТ</h2>
+                            <label>НИША *</label><input name="Ниша" onChange={updateField} />
+                            <label>ТОЧКА А (ОБОРОТ И ПРИБЫЛЬ) *</label>
+                            <textarea name="Точка_А" onChange={updateField}></textarea>
+                            <label>ФИЗИЧЕСКИЕ СИМПТОМЫ *</label>
                             <textarea name="Симптомы_Тела" onChange={updateField}></textarea>
-                            <label>ВАША «КРАСИВАЯ СКАЗКА» *</label>
-                            <div className="rule-box">Какую ложь о своем успехе вы рассказываете миру, чтобы скрыть хаос? (Мин. 20 симв.)</div>
+                            <label>«КРАСИВАЯ СКАЗКА» *</label>
+                            <div className="rule-box">Какую ложь вы транслируете миру? (Мин. 10 симв.)</div>
                             <textarea name="Ложь_Миру" onChange={updateField}></textarea>
-                            <button className="btn-prime" onClick={() => validateAndNext(["Ниша", "Точка_А", "Симптомы_Тела", "Ложь_Миру"], 15)}>ПЕРЕЙТИ К ДИАГНОСТИКЕ</button>
+                            <button className="btn-prime" onClick={() => validateAndNext(["Точка_А", "Симптомы_Тела", "Ложь_Миру"], ["Ниша"])}>ДАЛЕЕ</button>
                         </div>
                     )}
 
                     {step === 4 && (
                         <div className="glass-panel p-10 rounded-3xl">
-                            <span className="step-indicator">ШАГ 03 / 06</span>
-                            <h2 className="text-2xl font-bold text-sky-400 mb-6 uppercase">Блок 2: ПОИСК ТРЕЩИНЫ</h2>
+                            <h2 className="text-xl font-bold text-sky-400 uppercase">Блок 2: ТРЕЩИНЫ</h2>
                             <label>ИСТИННАЯ ЦЕЛЬ БИЗНЕСА *</label>
-                            <div className="rule-box">Зачем вам этот бизнес кроме денег? Власть, месть, безопасность, свобода?</div>
                             <textarea name="Истинная_Цель" onChange={updateField}></textarea>
-                            <label>ПОЧЕМУ ВАМ ВЫГОДЕН ЭТОТ ХАОС? *</label>
-                            <div className="rule-box">Что страшного случится, если вы наведете порядок и вырастете?</div>
+                            <label>ВЫГОДА ХАОСА *</label>
                             <textarea name="Выгода_Хаоса" onChange={updateField}></textarea>
-                            <label>СТОИМОСТЬ ОДНОГО МЕСЯЦА ЗАСТОЯ *</label>
-                            <input name="Цена_Простоя" onChange={updateField} placeholder="В рублях" />
-                            <label>«НЕИЗЛЕЧИМАЯ» ПРОБЛЕМА *</label>
-                            <div className="rule-box">Какую проблему вы считаете фатальной и боитесь обсуждать?</div>
+                            <label>СТОИМОСТЬ МЕСЯЦА ЗАСТОЯ *</label>
+                            <input name="Цена_Простоя" onChange={updateField} />
+                            <label>«НЕИЗЛЕЧИМОЕ» *</label>
                             <textarea name="Неизлечимое" onChange={updateField}></textarea>
                             <label>БАРЬЕР Х10 *</label>
-                            <div className="rule-box">Какое ОДНО препятствие блокирует ваш десятикратный рост?</div>
                             <textarea name="Барьер_X10" onChange={updateField}></textarea>
                             <label>ЗОНА МАКСИМАЛЬНОГО СОПРОТИВЛЕНИЯ *</label>
                             <select name="Зона_Боли" onChange={updateField}>
                                 <option value="">Выберите область...</option>
-                                <option value="Деньги">Деньги и Финансы</option>
-                                <option value="Команда">Команда и Люди</option>
-                                <option value="Стратегия">Стратегия и Хаос</option>
+                                <option value="Деньги">Деньги</option>
+                                <option value="Команда">Команда</option>
+                                <option value="Стратегия">Стратегия</option>
                             </select>
-                            <button className="btn-prime" onClick={() => validateAndNext(["Истинная_Цель", "Выгода_Хаоса", "Цена_Простоя", "Неизлечимое", "Барьер_X10", "Зона_Боли"], 10)}>ДАЛЕЕ</button>
+                            <button className="btn-prime" onClick={() => validateAndNext(["Истинная_Цель", "Выгода_Хаоса", "Неизлечимое", "Барьер_X10"], ["Цена_Простоя", "Зона_Боли"])}>ДАЛЕЕ</button>
                         </div>
                     )}
 
                     {step === 5 && (
                         <div className="glass-panel p-10 rounded-3xl">
-                            <span className="step-indicator">ШАГ 04 / 06</span>
-                            <h2 className="text-2xl font-bold text-sky-400 mb-6 uppercase">Блок 3: ГОТОВНОСТЬ</h2>
-                            <label>ГОТОВНОСТЬ К «НАПРАВЛЕННОМУ ВЗРЫВУ»? *</label>
-                            <select name="Взрыв_Убеждений" onChange={updateField}>
+                            <h2 className="text-xl font-bold text-sky-400 uppercase">Блок 3: ГОТОВНОСТЬ</h2>
+                            <label>ГОТОВНОСТЬ К «ВЗРЫВУ»? *</label>
+                            <select name="Взрыв" onChange={updateField}>
                                 <option value="">Выберите...</option>
-                                <option value="Да">Да, готов к полному сносу старого</option>
-                                <option value="Нет">Нет, ищу легких путей</option>
+                                <option value="Да">Да, готов к сносу старого</option>
+                                <option value="Нет">Нет</option>
                             </select>
-                            <label>КТО РЕШАЕТ — ВЫ ИЛИ СТРАХ? ГДЕ ОН В ТЕЛЕ? *</label>
+                            <label>КТО РЕШАЕТ — ВЫ ИЛИ СТРАХ? *</label>
                             <textarea name="Кто_Решает" onChange={updateField}></textarea>
-                            <label>СРОК ОБНУЛЕНИЯ СИСТЕМЫ БЕЗ ВАС *</label>
-                            <div className="rule-box">Через сколько дней ваш бизнес умрет, если вы исчезнете?</div>
+                            <label>СРОК ОБНУЛЕНИЯ СИСТЕМЫ *</label>
                             <input name="Смерть_Бизнеса" onChange={updateField} />
-                            <label>РЕЗУЛЬТАТ, ЗА КОТОРЫЙ ВЫ ОТДАДИТЕ 400.000 РУБ. *</label>
-                            <div className="rule-box">Опишите конкретное состояние системы или цифру. (Мин. 20 симв.)</div>
+                            <label>РЕЗУЛЬТАТ ЗА 400.000 РУБ. *</label>
                             <textarea name="За_Что_400к" onChange={updateField}></textarea>
-                            <button className="btn-prime" onClick={() => validateAndNext(["Взрыв_Убеждений", "Кто_Решает", "Смерть_Бизнеса", "За_Что_400к"], 15)}>ДАЛЕЕ</button>
+                            <button className="btn-prime" onClick={() => validateAndNext(["Кто_Решает", "За_Что_400к"], ["Взрыв", "Смерть_Бизнеса"])}>ДАЛЕЕ</button>
                         </div>
                     )}
 
                     {step === 6 && (
                         <div className="glass-panel p-10 rounded-3xl">
-                            <span className="step-indicator">ШАГ 05 / 06</span>
-                            <h2 className="text-2xl font-bold text-sky-400 mb-6 uppercase">Блок 4: ОБЯЗАТЕЛЬСТВА</h2>
-                            <label>РЕАЛЬНЫЙ СРОК ТРАНСФОРМАЦИИ *</label>
-                            <input name="Срок_Выхода" onChange={updateField} placeholder="Напр: 3-6 месяцев" />
-                            <label>КТО БУДЕТ ВНЕДРЯТЬ ИЗМЕНЕНИЯ? *</label>
-                            <div className="rule-box">Вы лично или есть доверенное лицо/команда?</div>
-                            <input name="Кто_Внедряет" onChange={updateField} />
-                            <label>РЕАКЦИЯ НА «КОСЯКИ» СОТРУДНИКОВ *</label>
-                            <div className="rule-box">Опишите физику: гнев, сжатие челюстей, апатия, ком в горле?</div>
-                            <textarea name="Реакция_Косяки" onChange={updateField}></textarea>
-                            <label>ИНВЕСТИЦИИ В «АВТОМАТИЗАЦИЮ ЧУДА» *</label>
-                            <input name="Бюджет" onChange={updateField} />
-                            <label>СКОЛЬКО ЧАСОВ В НЕДЕЛЮ ВЫДЕЛИТЕ НА СЕБЯ? *</label>
-                            <input name="Время_Архитектор" onChange={updateField} placeholder="Минимум 5 часов" />
-                            <button className="btn-prime" onClick={() => validateAndNext(["Срок_Выхода", "Кто_Внедряет", "Реакция_Косяки", "Бюджет", "Время_Архитектор"], 5)}>ПОСЛЕДНИЙ ШАГ</button>
+                            <h2 className="text-xl font-bold text-sky-400 uppercase">Блок 4: ОБЯЗАТЕЛЬСТВА</h2>
+                            <label>РЕАЛЬНЫЙ СРОК ТРАНСФОРМАЦИИ *</label><input name="Срок" onChange={updateField} />
+                            <label>КТО ВНЕДРЯЕТ? *</label><input name="Кто_Внедряет" onChange={updateField} />
+                            <label>РЕАКЦИЯ НА «КОСЯКИ» *</label><textarea name="Реакция" onChange={updateField}></textarea>
+                            <label>БЮДЖЕТ НА АВТОМАТИЗАЦИЮ *</label><input name="Бюджет" onChange={updateField} />
+                            <label>ЧАСОВ В НЕДЕЛЮ НА СЕБЯ *</label><input name="Время" onChange={updateField} />
+                            <button className="btn-prime" onClick={() => validateAndNext(["Реакция"], ["Срок", "Кто_Внедряет", "Бюджет", "Время"])}>ФИНАЛ</button>
                         </div>
                     )}
 
                     {step === 7 && (
                         <div className="glass-panel p-10 rounded-3xl">
-                            <span className="step-indicator">ШАГ 06 / 06</span>
-                            <h2 className="text-2xl font-bold text-sky-400 mb-6 uppercase">Блок 5: ФИНАЛЬНЫЙ ФИЛЬТР</h2>
-                            <label>ПОЧЕМУ МОЙ ДАР АРХИТЕКТОРА — КЛЮЧ К ВАМ? *</label>
-                            <textarea name="Почему_Я" onChange={updateField}></textarea>
-                            <label>ВАША ТОЧКА Б ЧЕРЕЗ ГОД (ДЕНЬГИ, ЧАСЫ, ЛОКАЦИЯ) *</label>
-                            <textarea name="Точка_Б" onChange={updateField}></textarea>
-                            <label>ВАШ НИК В TELEGRAM (@NAME) *</label>
-                            <input name="Ник_ТГ" onChange={updateField} placeholder="@username" />
-                            <button className="btn-prime" onClick={sendFinalData} disabled={isSubmitting}>
-                                {isSubmitting ? 'ТРИАДА ПРОВЕРЯЕТ...' : 'ОТПРАВИТЬ ДАННЫЕ АГЕНТАМ'}
-                            </button>
+                            <h2 className="text-xl font-bold text-sky-400 uppercase">Блок 5: ФИЛЬТР</h2>
+                            <label>ПОЧЕМУ АРХИТЕКТОР? *</label><textarea name="Почему_Я" onChange={updateField}></textarea>
+                            <label>ТОЧКА Б (ДЕНЬГИ, ЧАСЫ, ЛОКАЦИЯ) *</label><textarea name="Точка_Б" onChange={updateField}></textarea>
+                            <label>НИК В TELEGRAM (@NAME) *</label><input name="Ник_ТГ" onChange={updateField} />
+                            <button className="btn-prime" onClick={sendFinalData} disabled={isSubmitting}>ОТПРАВИТЬ АГЕНТАМ</button>
                         </div>
                     )}
 
                     {step === 8 && (
-                        <div className="glass-panel p-12 rounded-3xl text-center space-y-8 border-2 border-green-500/30">
-                            <div className="w-24 h-24 bg-green-500/10 rounded-full flex items-center justify-center mx-auto border border-green-500/40">
-                                <svg className="w-12 h-12 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
-                            </div>
+                        <div className="glass-panel p-12 rounded-3xl text-center space-y-8">
                             <h2 className="text-4xl font-black text-white uppercase italic">Скан завершен</h2>
-                            <p className="text-slate-400 text-sm leading-relaxed">Данные переданы Триаде Агентов (Analyst, Mirror, Guardian). Мы ищем корни вашего системного сбоя. Результат будет холодным и точным.</p>
-                            <div className="pt-8 border-t border-slate-800">
-                                <a href="https://t.me/no_chaos_business/17" target="_blank" className="btn-prime block">ИЗУЧИТЬ КЕЙС РЕКОНСТРУКЦИИ</a>
-                            </div>
+                            <p className="text-slate-400">Данные приняты. Триада Агентов начала анализ. Будьте на связи.</p>
+                            <a href="https://t.me/no_chaos_business/17" target="_blank" className="btn-prime block">ИЗУЧИТЬ КЕЙС</a>
                         </div>
                     )}
                 </div>
