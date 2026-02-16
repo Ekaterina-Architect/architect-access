@@ -54,15 +54,13 @@ HTML
             };
 
             const validateAndNext = (textFields, techFields = []) => {
-                // Проверка глубоких текстовых полей
                 for (let field of textFields) {
                     const value = formData[field] || "";
                     if (value.trim().length < 10) {
-                        setError(`ВНИМАНИЕ: Поле "${field.replace(/_/g, ' ')}" требует более глубокого ответа (мин. 10 символов).`);
+                        setError(`ВНИМАНИЕ: Поле "${field.replace(/_/g, ' ')}" требует глубины (минимум 10 символов). Триада не примет отписку.`);
                         return;
                     }
                 }
-                // Проверка обязательности технических полей (просто наличие)
                 for (let field of techFields) {
                     if (!formData[field] || formData[field].trim() === "") {
                         setError(`СИСТЕМА: Поле "${field.replace(/_/g, ' ')}" обязательно для заполнения.`);
@@ -77,7 +75,7 @@ HTML
             const sendFinalData = async () => {
                 if (!formData.Ник_ТГ) { setError("Укажите ваш ник в Telegram."); return; }
                 setIsSubmitting(true);
-                let message = `🚀 **DEEP SCAN PROTOCOL: СДАН**\n\n`;
+                let message = `🚀 **DEEP SCAN PROTOCOL: НОВЫЙ КЛИЕНТ**\n\n`;
                 Object.entries(formData).forEach(([key, val]) => {
                     message += `🔹 **${key.replace(/_/g, ' ')}:** ${val}\n`;
                 });
@@ -99,10 +97,16 @@ HTML
                     {step === 1 && (
                         <div className="glass-panel p-10 rounded-3xl border-t-8 border-sky-500">
                             <h1 className="text-4xl font-black mb-6 tracking-tighter italic">DEEP SCAN 2.0</h1>
-                            <p className="text-sm text-slate-300 mb-8 italic">«Это не опрос. Это сессия реинжиниринга вашей реальности».</p>
-                            <label>Email *</label>
-                            <input type="email" name="Email" onChange={updateField} />
-                            <button className="btn-prime" onClick={() => validateAndNext([], ["Email"])}>НАЧАТЬ</button>
+                            <div className="space-y-6 text-sm text-slate-300 mb-8">
+                                <p className="text-sky-400 font-bold uppercase underline">ПРАВИЛА ПРОХОЖДЕНИЯ (БЕЗ ИСКЛЮЧЕНИЙ):</p>
+                                <p>1. <strong>ИНВЕСТИЦИЯ ВРЕМЕНИ:</strong> Вам потребуется 15-20 минут в тишине. Если вы спешите или находитесь в людном месте — закройте анкету и вернитесь позже.</p>
+                                <p>2. <strong>РАДИКАЛЬНАЯ ЧЕСТНОСТЬ:</strong> Любая попытка казаться «удобным», «правильным» или «успешным» считывается Триадой Агентов как системная ошибка. Доступ будет аннулирован.</p>
+                                <p>3. <strong>БИОЛОГИЧЕСКИЙ ОТКЛИК:</strong> Тело знает больше, чем разум. Если при ответе вы чувствуете дискомфорт, гнев или страх — вы находитесь в точке роста. Не игнорируйте эти сигналы.</p>
+                                <p>4. <strong>ТРИАДА:</strong> Анализ ведут агенты Analytic, Mirror и Guardian. Будьте готовы к честному и холодному зеркалу вашей реальности.</p>
+                            </div>
+                            <label>Ваш актуальный Email *</label>
+                            <input type="email" name="Email" onChange={updateField} placeholder="example@mail.com" />
+                            <button className="btn-prime" onClick={() => validateAndNext([], ["Email"])}>АКТИВИРОВАТЬ СКАНИРОВАНИЕ</button>
                         </div>
                     )}
 
@@ -110,8 +114,8 @@ HTML
                         <div className="glass-panel p-10 rounded-3xl">
                             <h2 className="text-2xl font-bold text-sky-400 mb-6">01. ИДЕНТИФИКАЦИЯ</h2>
                             <label>ФИО ПОЛНОСТЬЮ *</label><input name="ФИО" onChange={updateField} />
-                            <label>ДАТА РОЖДЕНИЯ *</label><input name="Дата_Рождения" onChange={updateField} />
-                            <label>НОМЕР ТЕЛЕФОНА *</label><input name="Телефон" onChange={updateField} />
+                            <label>ДАТА РОЖДЕНИЯ *</label><input name="Дата_Рождения" onChange={updateField} placeholder="ДД.ММ.ГГГГ" />
+                            <label>НОМЕР ТЕЛЕФОНА (TG/WA) *</label><input name="Телефон" onChange={updateField} />
                             <label>ГОРОД И РАЗНИЦА С МСК *</label><input name="Локация" onChange={updateField} />
                             <button className="btn-prime" onClick={() => validateAndNext([], ["ФИО", "Дата_Рождения", "Телефон", "Локация"])}>ДАЛЕЕ</button>
                         </div>
@@ -120,37 +124,43 @@ HTML
                     {step === 3 && (
                         <div className="glass-panel p-10 rounded-3xl">
                             <h2 className="text-xl font-bold text-sky-400 uppercase">Блок 1: ФУНДАМЕНТ</h2>
-                            <label>НИША *</label><input name="Ниша" onChange={updateField} />
-                            <label>ТОЧКА А (ОБОРОТ И ПРИБЫЛЬ) *</label>
+                            <label>НИША И ВИД ДЕЯТЕЛЬНОСТИ *</label><input name="Ниша" onChange={updateField} />
+                            <label>ТОЧКА А: ОБОРОТ И ЧИСТАЯ ПРИБЫЛЬ *</label>
+                            <div className="rule-box">Укажите точные цифры. Ложь здесь сделает всю дальнейшую работу бессмысленной.</div>
                             <textarea name="Точка_А" onChange={updateField}></textarea>
-                            <label>ФИЗИЧЕСКИЕ СИМПТОМЫ *</label>
+                            <label>ФИЗИЧЕСКИЕ СИМПТОМЫ (ТЕЛО) *</label>
+                            <div className="rule-box">Что болит или зажимается при стрессе? Спина, ЖКТ, шея? Опишите физический зажим.</div>
                             <textarea name="Симптомы_Тела" onChange={updateField}></textarea>
-                            <label>«КРАСИВАЯ СКАЗКА» *</label>
-                            <div className="rule-box">Какую ложь вы транслируете миру? (Мин. 10 симв.)</div>
+                            <label>ВАША «КРАСИВАЯ СКАЗКА» *</label>
+                            <div className="rule-box">Какую ложь о своем успехе вы транслируете в мир, чтобы скрыть реальный хаос?</div>
                             <textarea name="Ложь_Миру" onChange={updateField}></textarea>
-                            <button className="btn-prime" onClick={() => validateAndNext(["Точка_А", "Симптомы_Тела", "Ложь_Миру"], ["Ниша"])}>ДАЛЕЕ</button>
+                            <button className="btn-prime" onClick={() => validateAndNext(["Точка_А", "Симптомы_Тела", "Ложь_Миру"], ["Ниша"])}>ПЕРЕЙТИ К ДИАГНОСТИКЕ</button>
                         </div>
                     )}
 
                     {step === 4 && (
                         <div className="glass-panel p-10 rounded-3xl">
-                            <h2 className="text-xl font-bold text-sky-400 uppercase">Блок 2: ТРЕЩИНЫ</h2>
+                            <h2 className="text-xl font-bold text-sky-400 uppercase">Блок 2: ПОИСК ТРЕЩИНЫ</h2>
                             <label>ИСТИННАЯ ЦЕЛЬ БИЗНЕСА *</label>
+                            <div className="rule-box">Зачем вам этот бизнес кроме денег? Власть, месть, безопасность, свобода?</div>
                             <textarea name="Истинная_Цель" onChange={updateField}></textarea>
                             <label>ВЫГОДА ХАОСА *</label>
+                            <div className="rule-box">Почему вам ВЫГОДНО, чтобы ничего не менялось? Что страшного случится при успехе?</div>
                             <textarea name="Выгода_Хаоса" onChange={updateField}></textarea>
-                            <label>СТОИМОСТЬ МЕСЯЦА ЗАСТОЯ *</label>
-                            <input name="Цена_Простоя" onChange={updateField} />
-                            <label>«НЕИЗЛЕЧИМОЕ» *</label>
+                            <label>СТОИМОСТЬ ОДНОГО МЕСЯЦА ЗАСТОЯ *</label>
+                            <input name="Цена_Простоя" onChange={updateField} placeholder="В рублях" />
+                            <label>«НЕИЗЛЕЧИМАЯ» ПРОБЛЕМА *</label>
+                            <div className="rule-box">Какую проблему вы считаете фатальной и боитесь обсуждать даже с собой?</div>
                             <textarea name="Неизлечимое" onChange={updateField}></textarea>
                             <label>БАРЬЕР Х10 *</label>
+                            <div className="rule-box">Какое ОДНО препятствие блокирует ваш десятикратный рост прямо сейчас?</div>
                             <textarea name="Барьер_X10" onChange={updateField}></textarea>
                             <label>ЗОНА МАКСИМАЛЬНОГО СОПРОТИВЛЕНИЯ *</label>
                             <select name="Зона_Боли" onChange={updateField}>
                                 <option value="">Выберите область...</option>
-                                <option value="Деньги">Деньги</option>
-                                <option value="Команда">Команда</option>
-                                <option value="Стратегия">Стратегия</option>
+                                <option value="Деньги">Деньги и Финансы</option>
+                                <option value="Команда">Команда и Люди</option>
+                                <option value="Стратегия">Стратегия и Хаос</option>
                             </select>
                             <button className="btn-prime" onClick={() => validateAndNext(["Истинная_Цель", "Выгода_Хаоса", "Неизлечимое", "Барьер_X10"], ["Цена_Простоя", "Зона_Боли"])}>ДАЛЕЕ</button>
                         </div>
@@ -159,17 +169,18 @@ HTML
                     {step === 5 && (
                         <div className="glass-panel p-10 rounded-3xl">
                             <h2 className="text-xl font-bold text-sky-400 uppercase">Блок 3: ГОТОВНОСТЬ</h2>
-                            <label>ГОТОВНОСТЬ К «ВЗРЫВУ»? *</label>
+                            <label>ГОТОВНОСТЬ К «НАПРАВЛЕННОМУ ВЗРЫВУ»? *</label>
                             <select name="Взрыв" onChange={updateField}>
                                 <option value="">Выберите...</option>
-                                <option value="Да">Да, готов к сносу старого</option>
-                                <option value="Нет">Нет</option>
+                                <option value="Да">Да, готов к сносу старого ради нового</option>
+                                <option value="Нет">Нет, хочу косметических правок</option>
                             </select>
-                            <label>КТО РЕШАЕТ — ВЫ ИЛИ СТРАХ? *</label>
+                            <label>КТО ПРИНИМАЕТ РЕШЕНИЯ — ВЫ ИЛИ СТРАХ? *</label>
                             <textarea name="Кто_Решает" onChange={updateField}></textarea>
-                            <label>СРОК ОБНУЛЕНИЯ СИСТЕМЫ *</label>
+                            <label>СРОК ОБНУЛЕНИЯ СИСТЕМЫ БЕЗ ВАС *</label>
+                            <div className="rule-box">Через сколько дней всё умрет, если вы исчезнете?</div>
                             <input name="Смерть_Бизнеса" onChange={updateField} />
-                            <label>РЕЗУЛЬТАТ ЗА 400.000 РУБ. *</label>
+                            <label>РЕЗУЛЬТАТ, ЗА КОТОРЫЙ ВЫ ОТДАДИТЕ 400.000 РУБ. *</label>
                             <textarea name="За_Что_400к" onChange={updateField}></textarea>
                             <button className="btn-prime" onClick={() => validateAndNext(["Кто_Решает", "За_Что_400к"], ["Взрыв", "Смерть_Бизнеса"])}>ДАЛЕЕ</button>
                         </div>
@@ -179,29 +190,33 @@ HTML
                         <div className="glass-panel p-10 rounded-3xl">
                             <h2 className="text-xl font-bold text-sky-400 uppercase">Блок 4: ОБЯЗАТЕЛЬСТВА</h2>
                             <label>РЕАЛЬНЫЙ СРОК ТРАНСФОРМАЦИИ *</label><input name="Срок" onChange={updateField} />
-                            <label>КТО ВНЕДРЯЕТ? *</label><input name="Кто_Внедряет" onChange={updateField} />
-                            <label>РЕАКЦИЯ НА «КОСЯКИ» *</label><textarea name="Реакция" onChange={updateField}></textarea>
-                            <label>БЮДЖЕТ НА АВТОМАТИЗАЦИЮ *</label><input name="Бюджет" onChange={updateField} />
-                            <label>ЧАСОВ В НЕДЕЛЮ НА СЕБЯ *</label><input name="Время" onChange={updateField} />
-                            <button className="btn-prime" onClick={() => validateAndNext(["Реакция"], ["Срок", "Кто_Внедряет", "Бюджет", "Время"])}>ФИНАЛ</button>
+                            <label>КТО БУДЕТ ВНЕДРЯТЬ ИЗМЕНЕНИЯ? *</label><input name="Кто_Внедряет" onChange={updateField} />
+                            <label>РЕАКЦИЯ НА «КОСЯКИ» СОТРУДНИКОВ *</label><textarea name="Реакция" onChange={updateField}></textarea>
+                            <label>ИНВЕСТИЦИИ В «АВТОМАТИЗАЦИЮ ЧУДА» *</label><input name="Бюджет" onChange={updateField} />
+                            <label>СКОЛЬКО ЧАСОВ В НЕДЕЛЮ ВЫДЕЛИТЕ НА СЕБЯ? *</label><input name="Время" onChange={updateField} />
+                            <button className="btn-prime" onClick={() => validateAndNext(["Реакция"], ["Срок", "Кто_Внедряет", "Бюджет", "Время"])}>ФИНАЛЬНЫЙ ФИЛЬТР</button>
                         </div>
                     )}
 
                     {step === 7 && (
                         <div className="glass-panel p-10 rounded-3xl">
-                            <h2 className="text-xl font-bold text-sky-400 uppercase">Блок 5: ФИЛЬТР</h2>
-                            <label>ПОЧЕМУ АРХИТЕКТОР? *</label><textarea name="Почему_Я" onChange={updateField}></textarea>
-                            <label>ТОЧКА Б (ДЕНЬГИ, ЧАСЫ, ЛОКАЦИЯ) *</label><textarea name="Точка_Б" onChange={updateField}></textarea>
-                            <label>НИК В TELEGRAM (@NAME) *</label><input name="Ник_ТГ" onChange={updateField} />
-                            <button className="btn-prime" onClick={sendFinalData} disabled={isSubmitting}>ОТПРАВИТЬ АГЕНТАМ</button>
+                            <h2 className="text-xl font-bold text-sky-400 uppercase">Блок 5: СООТВЕТСТВИЕ</h2>
+                            <label>ПОЧЕМУ МОЙ ДАР АРХИТЕКТОРА — ВАШ КЛЮЧ? *</label><textarea name="Почему_Я" onChange={updateField}></textarea>
+                            <label>ВАША ТОЧКА Б ЧЕРЕЗ ГОД *</label><textarea name="Точка_Б" onChange={updateField}></textarea>
+                            <label>НИК В TELEGRAM (@NAME) *</label><input name="Ник_ТГ" onChange={updateField} placeholder="@username" />
+                            <button className="btn-prime" onClick={sendFinalData} disabled={isSubmitting}>
+                                {isSubmitting ? 'ТРИАДА ПРОВЕРЯЕТ...' : 'ОТПРАВИТЬ ДАННЫЕ АГЕНТАМ'}
+                            </button>
                         </div>
                     )}
 
                     {step === 8 && (
-                        <div className="glass-panel p-12 rounded-3xl text-center space-y-8">
+                        <div className="glass-panel p-12 rounded-3xl text-center space-y-8 border-2 border-green-500/30">
                             <h2 className="text-4xl font-black text-white uppercase italic">Скан завершен</h2>
-                            <p className="text-slate-400">Данные приняты. Триада Агентов начала анализ. Будьте на связи.</p>
-                            <a href="https://t.me/no_chaos_business/17" target="_blank" className="btn-prime block">ИЗУЧИТЬ КЕЙС</a>
+                            <p className="text-slate-400 text-sm leading-relaxed">Данные переданы Триаде. Мы ищем корни системного сбоя. Будьте готовы к холодному вердикту.</p>
+                            <div className="pt-8 border-t border-slate-800">
+                                <a href="https://t.me/no_chaos_business/17" target="_blank" className="btn-prime block">ИЗУЧИТЬ КЕЙС РЕКОНСТРУКЦИИ</a>
+                            </div>
                         </div>
                     )}
                 </div>
