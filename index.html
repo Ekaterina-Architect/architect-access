@@ -247,7 +247,7 @@ HTML
 - Взрыв: ${formData.Взрыв}
 - Решение: ${formData.Решение}
 - Смерть Системы: ${formData.Смерть}
-- Результат за 400к: ${formData.Результат_400к}
+- Результат за 500к: ${formData.Результат_500к}
 
 🛠 **SECTION 5: RESOURCES**
 - Срок: ${formData.Срок}
@@ -436,11 +436,11 @@ HTML
                                         <input name="Смерть" onChange={handleUpdate} placeholder="Сколько дней продержится система?" />
                                     </div>
                                     <div className="input-wrapper">
-                                        <label>Результат, за который готов отдать 400к+ *</label>
+                                        <label>Результат, за который готов отдать 500к+ *</label>
                                         <div className="rule-box">Опиши результат одной сессии, за который ты готов заплатить без колебаний.</div>
-                                        <textarea name="Результат_400к" rows="2" onChange={handleUpdate}></textarea>
+                                        <textarea name="Результат_500к" rows="2" onChange={handleUpdate}></textarea>
                                     </div>
-                                    <button className="btn-primary" onClick={() => validateStep(["Решение", "Результат_400к"], 10)}>Блок Ресурсов</button>
+                                    <button className="btn-primary" onClick={() => validateStep(["Решение", "Результат_500к"], 10)}>Блок Ресурсов</button>
                                 </div>
                             </div>
                         )}
